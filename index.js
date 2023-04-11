@@ -25,6 +25,47 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get("/api/",function(req,res){
+  var myDateObject = new Date();
+
+  var unixTime = (myDateObject.getTime());
+    var utcDate = myDateObject.toUTCString();
+  res.json({unix:unixTime,utc:utcDate});
+
+});
+
+app.get("/api/:datestring",function(req,res){
+  var unixTime;
+  var utcDate;
+  var myDateObject;
+  //try and create a date oject from the request parameter
+  if(req.params.datestring==""){
+    myDateObject=new Date();
+  }else{
+  var myDateObject = new Date(req.params.datestring);
+  }
+
+  //if the object was created successfully then set the unix time and the 
+  if(myDateObject instanceof Date && !isNaN(myDateObject)){
+    unixTime = (myDateObject.getTime());
+    utcDate = myDateObject.toUTCString();
+  }else{
+  //else if there was no object succefully created the the date date was invalid so try and create a date objectfrom the number passed. 
+    unixTime=parseInt(req.params.datestring);    
+    utcDate = new Date(unixTime).toUTCString(); 
+  }
+
+  //Check once again if the a date object has been successfully created.
+  if(!isNaN(unixTime)){
+  //if so then return the unix and utc Date
+  res.json({unix:unixTime,utc:utcDate});
+  console.log(unixTime);
+  } else {
+    //else return an error message
+    res.json({"error":"Invalid Date"});
+  }
+})
+
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
